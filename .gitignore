@@ -8,6 +8,8 @@ feature-engineering-test-files*
 
 # Temp files
 temp.py
+temp.ipynb
+temp.model
 
 # Everything below here is Github's python gitignore
 
