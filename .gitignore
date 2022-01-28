@@ -2,9 +2,6 @@
 # Temp files
 temp.py
 
-# Segmentation model-training notebooks
-Segmentation/*.ipynb
-
 # Everything below here is Github's python gitignore
 
 # Byte-compiled / optimized / DLL files
