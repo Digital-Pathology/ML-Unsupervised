@@ -1,4 +1,11 @@
 
+# Ritik's gitignore stuff
+# TODO - fix this up
+src/FeatureEngineering/local_images/*
+AWSConfig/credentials
+testing.ipynb
+feature-engineering-test-files*
+
 # Temp files
 temp.py
 
