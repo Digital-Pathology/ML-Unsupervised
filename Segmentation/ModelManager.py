@@ -7,6 +7,7 @@ CURRENT_DIR = os.path.dirname(__file__)
 DEFAULT_DIR = CURRENT_DIR + os.path.sep + "Models"
 DEFAULT_MODEL_INFO = "ModelInfo.json"
 
+
 class ModelManager(object):
 
     def __init__(self, dir_path: str = DEFAULT_DIR, model_info_filename: str = DEFAULT_MODEL_INFO):
@@ -35,7 +36,7 @@ class ModelManager(object):
             raise Exception(f"{model_name} not in model_info")
         # TODO - load model using pytorch's model loading feature
         raise NotImplementedError()
-    
+
     @staticmethod
     def is_json_serializable(data: Any) -> bool:
 

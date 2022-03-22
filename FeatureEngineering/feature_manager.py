@@ -1,6 +1,7 @@
 import importlib
 import pyclbr
 
+
 class FeatureManager():
     '''
     Calculates and returns features based on the features specified in the constructor. 
@@ -25,17 +26,22 @@ class FeatureManager():
             - MeanHSV
             - HistogramHSV
     '''
+
     def __init__(self, image, mask_image, feature_dict=None) -> None:
-        self.features = feature_dict if feature_dict else self._get_feature_dict(["geometric_features", "color_features"])
+        self.features = feature_dict if feature_dict else self._get_feature_dict(
+            ["geometric_features", "color_features"])
         self.image = image
         self.mask_image = mask_image
+
     def __call__(self):
         return self._calculate_features(self.features)
+
     def _get_feature_dict(self, feature_types):
         output = {}
         for feature_type in feature_types:
             output[feature_type] = pyclbr.readmodule(feature_type).keys()
         return output
+
     def _calculate_features(self, feature_dict):
         output = {}
         for feature_type in feature_dict.keys():
