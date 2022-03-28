@@ -1,2 +1,2 @@
 
-from . import FileReader, FileViewer
+from . import FileReader, FileViewer, util

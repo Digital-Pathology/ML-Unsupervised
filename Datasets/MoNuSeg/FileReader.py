@@ -51,9 +51,31 @@ def get_annotations(filename):
     with open(filepath, 'r') as f:
         annotations = f.read()
         annotations = xmltodict.parse(annotations)
-    return annotations
+    return process_annotations(annotations)
 
 def process_annotations(annotations):
+    def process_region(region):
+        data = {}
+        for key, value in region.items():
+            if key[0] == '@':
+                data[key[1:]] = value
+            elif key == 'Attributes':
+                pass
+            elif key == 'Vertices':
+                data['vertices_x'] = []
+                data['vertices_y'] = []
+                vertices = value['Vertex']
+                for vertex in vertices:
+                    data['vertices_x'].append(float(vertex['@X']))
+                    data['vertices_y'].append(float(vertex['@Y']))
+            else:
+                raise Exception(key, value)
+        return data
     regions = []
-    regions_iter = annotations['Annotations']['Annotation']['Regions'].items()
-
+    for region in annotations['Annotations']['Annotation']['Regions']['Region']:
+        processed_region = process_region(region)
+        #print(processed_region)
+        #print(min(processed_region['vertices_x']), max(processed_region['vertices_x']))
+        #print(min(processed_region['vertices_y']), max(processed_region['vertices_y']))
+        regions.append(processed_region)
+    return regions
