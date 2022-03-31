@@ -9,6 +9,8 @@ from torchvision import transforms
 
 import xmltodict
 
+from . import util
+
 # filepaths and extensions
 path_data_dir = __file__.replace(os.path.basename(__file__),"")
 path_data_images = path_data_dir + 'Images/'
@@ -29,10 +31,10 @@ def clean_filepath(filename, path_data_, path_extension_):
     filepath = ("" if path_data_ in filename else path_data_) + filename
     if path_extension_ not in filename: filepath += path_extension_
     return filepath
-def get_image(filename):
+def get_image(filename, as_np=False):
     filepath = clean_filepath(filename, path_data_images, path_extension_image)
     image = Image.open(filepath)
-    image = pil_to_tensor(image)
+    if not as_np: image = pil_to_tensor(image)
     return image
 def get_mask(filename):
     filepath = clean_filepath(filename, path_data_masks, path_extension_mask)
@@ -52,6 +54,23 @@ def get_annotations(filename):
         annotations = f.read()
         annotations = xmltodict.parse(annotations)
     return process_annotations(annotations)
+def get_polymask(filename, print_overlapping_items=False):
+    annotations = get_annotations(filename)
+    polymask = np.zeros((1000,1000))
+    for i, region in enumerate(annotations):
+        mask = util.poly2mask(
+            region['vertices_x'],
+            region['vertices_y'],
+            (1000,1000)
+        ).astype(int)
+        overlapping_mask = ((mask > 0).astype(int) + (polymask > 0).astype(int)) > 1
+        if np.any(overlapping_mask):
+            if print_overlapping_items:
+                print(i, end=', ')
+        else:
+            mask *= i+1
+            polymask[mask > 0] = mask[mask > 0]
+    return polymask
 
 def process_annotations(annotations):
     def process_region(region):
