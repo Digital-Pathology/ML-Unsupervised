@@ -27,7 +27,7 @@ def main():
     )
 
     data_loader = torch.utils.data.DataLoader(
-        dataset, batch_size=4, shuffle=True, num_workers=2,
+        dataset, batch_size=1, shuffle=True, num_workers=1,
         collate_fn=mrcnn.torchvision_utils.utils.collate_fn)
 
     device = torch.device(
