@@ -23,6 +23,7 @@ path_extension_annotation = '.xml'
 # get a list of the filenames
 files = [f.replace(path_extension_image, '')
          for f in os.listdir(path_data_images)]
+files.sort()
 
 # file reading utils
 pil_to_tensor = transforms.ToTensor()
