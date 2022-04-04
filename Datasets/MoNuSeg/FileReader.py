@@ -51,30 +51,33 @@ def get_image(filename, as_np=False):
     return image
 
 
-def get_mask(filename):
+def get_mask(filename, as_np=False):
     """ gets the binary mask for the file """
     filepath = clean_filepath(filename, path_data_masks, path_extension_mask)
     mask = Image.open(filepath)
-    mask = pil_to_tensor(mask)
+    if not as_np:
+        mask = pil_to_tensor(mask)
     mask = mask.clamp(min=0, max=1)
     return mask
 
 
-def get_colormask(filename):
+def get_colormask(filename, as_np=False):
     """ gets the colormask from the original dataset's matlab script """
     filepath = clean_filepath(
         filename, path_data_colormasks, path_extension_colormask)
     colormask = Image.open(filepath)
-    colormask = pil_to_tensor(colormask)
+    if not as_np:
+        colormask = pil_to_tensor(colormask)
     return colormask
 
 
-def get_polymask(filename):
+def get_polymask(filename, as_np=False):
     """ returns the polymask for the file """
     filepath = clean_filepath(
         filename, path_data_polymasks, path_extension_polymask)
     polymask = Image.open(filepath)
-    polymask = pil_to_tensor(polymask)
+    if not as_np:
+        polymask = pil_to_tensor(polymask)
     return polymask
 
 
