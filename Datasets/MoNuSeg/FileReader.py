@@ -1,7 +1,10 @@
 
+"""
+    An interface into the files in the dataset
+"""
+
 import os
 
-import numpy as np
 from PIL import Image
 from torchvision import transforms
 
@@ -14,10 +17,12 @@ path_data_dir = __file__.replace(os.path.basename(__file__), "")
 path_data_images = path_data_dir + 'Images/'
 path_data_masks = path_data_dir + 'Masks/'
 path_data_colormasks = path_data_dir + 'ColorMasks/'
+path_data_polymasks = path_data_dir + 'PolyMasks/'
 path_data_annotations = path_data_dir + 'Annotations/'
 path_extension_image = '.png'
 path_extension_mask = '-mask.png'
 path_extension_colormask = '-mask-color.png'
+path_extension_polymask = '-mask-poly.png'
 path_extension_annotation = '.xml'
 
 # get a list of the filenames
@@ -64,62 +69,21 @@ def get_colormask(filename):
     return colormask
 
 
+def get_polymask(filename):
+    """ returns the polymask for the file """
+    filepath = clean_filepath(
+        filename, path_data_polymasks, path_extension_polymask)
+    polymask = Image.open(filepath)
+    polymask = pil_to_tensor(polymask)
+    return polymask
+
+
 def get_annotations(filename):
     """ returns xmltodict of the annotations """
     filepath = clean_filepath(
         filename, path_data_annotations, path_extension_annotation)
     annotations = None
-    with open(filepath, 'r') as f:
+    with open(filepath, 'r', encoding='utf-8') as f:
         annotations = f.read()
         annotations = xmltodict.parse(annotations)
-    return process_annotations(annotations)
-
-
-def get_polymask(filename, print_overlapping_items=False):
-    """ creates a polymask from region annotations """
-    annotations = get_annotations(filename)
-    polymask = np.zeros((1000, 1000))
-    for i, region in enumerate(annotations):
-        mask = util.poly2mask(
-            region['vertices_y'],
-            region['vertices_x'],
-            (1000, 1000)
-        ).astype(int)
-        overlapping_mask = ((mask > 0).astype(
-            int) + (polymask > 0).astype(int)) > 1
-        if np.any(overlapping_mask):
-            if print_overlapping_items:
-                print(i, end=', ')
-        else:
-            mask *= i+1
-            polymask[mask > 0] = mask[mask > 0]
-    return polymask
-
-
-def process_annotations(annotations):
-    """ parses the regions from the annotations xml """
-    def process_region(region):
-        data = {}
-        for key, value in region.items():
-            if key[0] == '@':
-                data[key[1:]] = value
-            elif key == 'Attributes':
-                pass
-            elif key == 'Vertices':
-                data['vertices_x'] = []
-                data['vertices_y'] = []
-                vertices = value['Vertex']
-                for vertex in vertices:
-                    data['vertices_x'].append(float(vertex['@X']))
-                    data['vertices_y'].append(float(vertex['@Y']))
-            else:
-                raise Exception(key, value)
-        return data
-    regions = []
-    for region in annotations['Annotations']['Annotation']['Regions']['Region']:
-        processed_region = process_region(region)
-        # print(processed_region)
-        #print(min(processed_region['vertices_x']), max(processed_region['vertices_x']))
-        #print(min(processed_region['vertices_y']), max(processed_region['vertices_y']))
-        regions.append(processed_region)
-    return regions
+    return util.process_annotations(annotations)
