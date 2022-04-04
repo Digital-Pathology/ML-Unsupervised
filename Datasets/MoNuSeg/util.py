@@ -1,10 +1,10 @@
 
 import numpy as np
-from skimage import draw
 
 
 def poly2mask(vertex_row_coords, vertex_col_coords, shape):
     """ https://github.com/scikit-image/scikit-image/issues/1103 """
+    from skimage import draw
     fill_row_coords, fill_col_coords = draw.polygon(
         vertex_row_coords, vertex_col_coords, shape)
     mask = np.zeros(shape, dtype=np.bool)
@@ -51,6 +51,8 @@ def process_annotations(annotations):
             else:
                 raise Exception(key, value)
         return data
+    import xmltodict
+    annotations = xmltodict.parse(annotations)
     regions = []
     for region in annotations['Annotations']['Annotation']['Regions']['Region']:
         processed_region = process_region(region)

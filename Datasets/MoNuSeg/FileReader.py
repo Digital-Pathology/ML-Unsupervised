@@ -8,8 +8,6 @@ import os
 from PIL import Image
 from torchvision import transforms
 
-import xmltodict
-
 from . import util
 
 # filepaths and extensions
@@ -88,5 +86,4 @@ def get_annotations(filename):
     annotations = None
     with open(filepath, 'r', encoding='utf-8') as f:
         annotations = f.read()
-        annotations = xmltodict.parse(annotations)
     return util.process_annotations(annotations)
