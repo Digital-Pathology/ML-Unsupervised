@@ -80,8 +80,8 @@ def get_polymask(filename, print_overlapping_items=False):
     polymask = np.zeros((1000, 1000))
     for i, region in enumerate(annotations):
         mask = util.poly2mask(
-            region['vertices_x'],
             region['vertices_y'],
+            region['vertices_x'],
             (1000, 1000)
         ).astype(int)
         overlapping_mask = ((mask > 0).astype(
