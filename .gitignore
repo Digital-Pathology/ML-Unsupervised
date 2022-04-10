@@ -1,7 +1,6 @@
 
 # Ritik's gitignore stuff
 # TODO - fix this up
-src/FeatureEngineering/local_images/*
 AWSConfig/credentials
 testing.ipynb
 feature-engineering-test-files*
@@ -75,10 +74,6 @@ coverage.xml
 local_settings.py
 db.sqlite3
 db.sqlite3-journal
-
-# Flask stuff:
-instance/
-.webassets-cache
 
 # Scrapy stuff:
 .scrapy
