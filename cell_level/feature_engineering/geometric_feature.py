@@ -104,11 +104,5 @@ class InsideRadialContact(GeometricFeature):
         i = np.around(distanceTransform(mask.astype('uint8'),
                                         DIST_L2, DIST_MASK_PRECISE), decimals=2)
         i = i[i > 0]
-        print(i)
-        print(i.shape)
-        print(np.unique(i))
         i = i / np.max(i)
-        print(i.shape)
-        print(i)
-        print(np.unique(i))
         return np.histogram(i[i > 0], bins=self.bins)[0].tolist()

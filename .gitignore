@@ -1,4 +1,7 @@
 
+# Adin's ignores
+*temp.csv
+
 # Ritik's gitignore stuff
 # TODO - fix this up
 AWSConfig/credentials

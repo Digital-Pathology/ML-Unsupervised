@@ -1,3 +1,3 @@
 
 from . cell_extractor import CellExtractor
-from . import Instance, FeatureEngineering, Segmentation
+from . import instance, feature_engineering, segmentation

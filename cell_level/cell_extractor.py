@@ -5,13 +5,10 @@
 
 from typing import Callable, Iterable
 
-import numpy as np
-import pandas as pd
-
+from . import feature_engineering
+from . import instance
+from . import segmentation
 from . import util
-from . import FeatureEngineering
-from . import Instance
-from . import Segmentation
 
 # TODO - docstrings
 
@@ -40,9 +37,9 @@ class CellExtractor:
                 feature_summary = post_processor(feature_summary)
         return [process_cell(cell) for cell in cells]
 
-    def extract_cells(self, image) -> Iterable[Instance.Instance]:
+    def extract_cells(self, image) -> Iterable[instance.Instance]:
         instances = None
-        if isinstance(self.extractor, Segmentation.ManagedModel):
+        if isinstance(self.extractor, segmentation.ManagedModel):
             instances = self.extractor.get_instances(image)
         else:
             instances = self.extractor(image)
@@ -56,17 +53,17 @@ class CellExtractor:
             raise NotImplementedError()
         elif isinstance(self.features, Iterable):
             raise NotImplementedError()
-        elif isinstance(self.features, FeatureEngineering.Feature):
+        elif isinstance(self.features, feature_engineering.Feature):
             pass
-        elif isinstance(self.features, FeatureEngineering.FeatureManager):
+        elif isinstance(self.features, feature_engineering.FeatureManager):
             pass
         else:
             raise TypeError(type(self.features), self.features)
 
     def _initialize_extractor(self):
         if isinstance(self.extractor, str):
-            self.extractor = Segmentation.ModelManager().load_model(self.extractor)
-        elif isinstance(self.extractor, Segmentation.ManagedModel):
+            self.extractor = segmentation.ModelManager().load_model(self.extractor)
+        elif isinstance(self.extractor, segmentation.ManagedModel):
             pass
         elif isinstance(self.extractor, Callable):
             pass

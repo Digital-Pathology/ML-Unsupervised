@@ -3,24 +3,24 @@ from typing import Any, Callable, Iterable, NewType, Union
 
 import numpy as np
 
-from . import FeatureEngineering
-from . import Instance
-from . import Segmentation
+from . import feature_engineering
+from . import instance
+from . import segmentation
 
 Features = NewType('Features',
                    Union[
                        str,
                        Iterable[str],
-                       FeatureEngineering.Feature,
-                       FeatureEngineering.FeatureManager,
-                       Callable[[Instance.Instance], dict[str, Any]]
+                       feature_engineering.Feature,
+                       feature_engineering.FeatureManager,
+                       Callable[[instance.Instance], dict[str, Any]]
                    ]
                    )
 
 Extractor = NewType('Extractor',
                     Union[
                         str,
-                        Segmentation.ManagedModel,
-                        Callable[[np.ndarray], Iterable[Instance.Instance]]
+                        segmentation.ManagedModel,
+                        Callable[[np.ndarray], Iterable[instance.Instance]]
                     ]
                     )
