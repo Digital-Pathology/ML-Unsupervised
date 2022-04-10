@@ -1,0 +1,3 @@
+
+class InstancePlaceholder:
+    pass

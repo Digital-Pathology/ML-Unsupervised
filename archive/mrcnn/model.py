@@ -3,6 +3,7 @@
 import json
 import os
 import pickle
+from typing import Iterable
 
 # pip imports
 import cv2 as cv
@@ -21,34 +22,24 @@ from . import torchvision_utils
 
 # intrapackage imports
 from . import config
-
-
-class Predictions:
-    """ wraps the predictions tensor (shape=[100,1,N,N]) with easy indexing """
-
-    def __init__(self, predictions):
-        """ stores vanilla predictions """
-        self.data = predictions
-
-    def __getitem__(self, index):
-        """ easy indexing """
-        return self.data[index, 0].byte().numpy()
+from . import predictions
 
 
 class MyModel:
-    """ wraps the model from the tutorial I'm following 
+    """ wraps the model from the tutorial I'm following
     original: https://github.com/pytorch/tutorials/blob/master/_static/torchvision_finetuning_instance_segmentation.ipynb
     my changes: https://colab.research.google.com/drive/1ZWBjCJd06YrCVSCxxkXRiuXQXoAmBFoy?usp=sharing"""
 
-    def __init__(self, filepath=config.DEFAULT_MODEL_FILEPATH):
+    def __init__(self, model=config.DEFAULT_MODEL_FILEPATH):
         """  """
-        self.load_model(filepath)
+        if isinstance(model, str):
+            self.load_model(model)
+        else:
+            self.model = model
 
-    def load_model(self, filepath):
+    def load_model(self, filepath, map_location="cpu"):
         """ loads model from pickle file """
-        self.model = None
-        with open(filepath, "rb") as f:
-            self.model = pickle.load(f)
+        self.model = torch.load(filepath, map_location=map_location)
 
     def save_model(self, filepath):
         """ saves the model to a pickle file """
@@ -58,10 +49,10 @@ class MyModel:
 
     def get_predictions(self, img):
         """ returns wrapped predictions --> use: predictions[i]"""
-        prediction = None
+        p = None
         with torch.no_grad():
-            prediction = self.model([img])
-        return Predictions(prediction[0]['masks'])
+            p = self.model([img])
+        return predictions.Predictions(p[0])
 
     def do_epoch(self, optimizer, data_loader, device, epoch_num=0):
         """ does a single epoch """
