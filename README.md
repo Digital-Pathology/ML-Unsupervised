@@ -1,4 +1,4 @@
-# ML-Unsupervised
+# Cell Level Models
 
 ## Workflow Overview
 
@@ -13,13 +13,7 @@ Each component can be developed independently, and a pipeline was established to
 
 ## Segmentation
 
-The segmentation module exists to keep various pytorch models accessible for testing and deployment purposes. It has a single interface `ModelManager`. To use the segmentation models import like so:
-```python
-from Segmentation import ModelManager
-model = ModelManager.load_model("my_favorite_model")
-```
-
-Saving a model is a bit complicated because of the potential for dependencies. To ensure that the model can be deployed successfully, the user who saves the model using `ModelManager.save_model(model, model_name, model_info)` needs to specify a function that initializes the model. Any dependencies should be imported in that initialization function. Please direct any and all questions to Adin at adinbsolomon@gmail.com.
+TODO
 
 ## Feature Engineering
 
