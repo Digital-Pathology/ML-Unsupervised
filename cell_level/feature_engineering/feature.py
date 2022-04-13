@@ -22,3 +22,6 @@ class Feature(abc.ABC):
 
     @abc.abstractmethod
     def calculate_feature(self, image, mask): pass
+
+    @property
+    def bins(self): pass

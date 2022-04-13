@@ -95,7 +95,7 @@ class InsideRadialContact(GeometricFeature):
     '''
 
     def __init__(self):
-        self.bins = util.get_bins(7)
+        self._bins = util.get_bins(7)
 
     def calculate_feature(self, image, mask):
         return self._distance_transform(mask)
@@ -105,4 +105,8 @@ class InsideRadialContact(GeometricFeature):
                                         DIST_L2, DIST_MASK_PRECISE), decimals=2)
         i = i[i > 0]
         i = i / np.max(i)
-        return np.histogram(i[i > 0], bins=self.bins)[0].tolist()
+        return np.histogram(i[i > 0], bins=self._bins)[0].tolist()
+
+    @property
+    def bins(self):
+        return len(self._bins)

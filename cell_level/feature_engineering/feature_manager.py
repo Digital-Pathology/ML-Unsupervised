@@ -5,6 +5,7 @@ from typing import Dict
 from . import feature
 from . import color_feature
 from . import geometric_feature
+from . import util
 
 
 def get_feature_map(cls):
@@ -54,9 +55,15 @@ class FeatureManager(feature.Feature):
             self.features.items()
         })
         if self.as_vector:
-            for k, v in data.items():
-                if isinstance(v, list):
-                    del data[k]
-                    for i, obj in enumerate(v):
-                        data[f"{k}{i}"] = obj
+            data = util.vectorize_dictionary(data)
+        return data
+
+    def get_empty_feature_set(self):
+        data = OrderedDict({
+            feature_name: None if feature_obj.bins is None else [None]*feature_obj.bins for
+            feature_name, feature_obj in
+            self.features.items()
+        })
+        if self.as_vector:
+            data = util.vectorize_dictionary(data)
         return data

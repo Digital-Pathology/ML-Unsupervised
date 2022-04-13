@@ -28,6 +28,10 @@ class MeanHSV(ColorFeature):
         hsv = util.apply_mask_to_image(hsv, mask_3d)
         return [hsv[:, :, 0].mean(), hsv[:, :, 1].mean(), hsv[:, :, 2].mean()]
 
+    @property
+    def bins(self):
+        return 3
+
 
 class HueHistogram(ColorFeature):
     '''
@@ -39,7 +43,7 @@ class HueHistogram(ColorFeature):
     '''
 
     def __init__(self):
-        self.bins = util.get_bins(32)
+        self._bins = util.get_bins(32)
 
     def calculate_feature(self, image, mask):
         hsv = rgb_to_hsv(image)
@@ -50,3 +54,7 @@ class HueHistogram(ColorFeature):
             hsv[:, :, 0],
             bins=self.bins
         )[0].tolist()
+
+    @property
+    def bins(self):
+        return len(self._bins)
