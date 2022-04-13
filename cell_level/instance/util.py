@@ -6,6 +6,19 @@ class InvalidArguments(Exception):
     pass
 
 
+def construct_mask_from_points(points_x, points_y, bounding_box):
+    if bounding_box is None:
+        bounding_box = get_box_from_points(points_x, points_y)
+    mask_dimensions = (
+        bounding_box[3]-bounding_box[1], bounding_box[2]-bounding_box[0])
+    mask = poly2mask(
+        [x-bounding_box[0] for x in points_x],
+        [y-bounding_box[1] for y in points_y],
+        mask_dimensions
+    )
+    return mask
+
+
 def get_box_from_points(points_x, points_y):
     x_min = min(points_x)
     x_max = max(points_x)
