@@ -32,7 +32,7 @@ class FeatureManager(feature.Feature):
             - InsideRadialContact
         * color_features:
             - MeanHSV
-            - HistogramHSV
+            - HueHistogram
     '''
 
     def __init__(self, as_vector: bool = True, **kwargs) -> None:
