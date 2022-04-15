@@ -1,2 +1,2 @@
 
-from . import MoNuSeg, CellCrops
+from . import monuseg, cell_crops
