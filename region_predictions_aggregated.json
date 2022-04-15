@@ -1,0 +1,12 @@
+{
+    "/workspaces/dev-container/testing/training-simple/test-wsi/0/84429T_003.tif": {
+        "0": 5523,
+        "1": 5643,
+        "2": 5459
+    },
+    "/workspaces/dev-container/testing/training-simple/test-wsi/1/84440T_004.tif": {
+        "1": 5808,
+        "2": 5697,
+        "0": 5875
+    }
+}
