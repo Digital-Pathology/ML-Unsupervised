@@ -1,0 +1,7 @@
+
+import os
+
+SM_CHANNEL_TRAIN = os.getenv('SM_CHANNEL_TRAIN')
+SM_CHANNEL_TEST = os.getenv('SM_CHANNEL_TEST')
+SM_MODEL_DIR = os.getenv('SM_MODEL_DIR')
+SM_CHECKPOINT_DIR = os.getenv('SM_CHECKPOINT_DIR')
