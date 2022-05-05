@@ -23,7 +23,7 @@ import sagemaker_stuff  # TODO - make job configurable from sagemaker notebook
 from model_analysis.by_region_analysis_job import WeightRatioAnalysisJob
 
 
-def initialize_dataset(filtration_cache_filepath=None):
+def initialize_dataset():
     dataset = Dataset(
         data_dir=sagemaker_stuff.config.SM_CHANNEL_TRAIN,
         labels=sagemaker_stuff.config.SM_CHANNEL_TRAIN,
@@ -43,7 +43,7 @@ def do_analysis_job_preprocessing(dataset, callback, loadingbars: bool = False):
 
 def announce(*args, **kwargs):
     for arg in args:
-        print(f"\n==> {arg}\n", **kwargs)
+        print(f"\n--> {arg}\n", **kwargs)
 
 
 def main():
