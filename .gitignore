@@ -1,6 +1,7 @@
 
 # Adin's ignores
 *temp.csv
+filtration_cache.h5
 
 # Ritik's gitignore stuff
 # TODO - fix this up
