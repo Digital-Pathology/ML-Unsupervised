@@ -30,10 +30,11 @@ class RegionPredictionsStore(abc.ABC):
             json.dump(self.data, f)
 
     def load_region_predictions(self):
-        if not os.path.exists(self.filename):
-            return {}
-        with open(self.filename, 'r', encoding='utf-8') as f:
-            self.data = json.load(f)
+        if os.path.exists(self.filename):
+            with open(self.filename, 'r', encoding='utf-8') as f:
+                self.data = json.load(f)
+        else:
+            self.data = {}
 
 
 class IndexedRegionPredictionsStore(RegionPredictionsStore):
