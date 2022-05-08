@@ -1,3 +1,4 @@
+
 from typing import Callable, Optional
 import torch
 import os
@@ -143,33 +144,24 @@ class MyModel:
             **state
         }, path)
 
-    def load_checkpoint(self):
+    def load_checkpoint(self, filepath, eval_only=False):
         """
         load_checkpoint _summary_
 
         :return: _description_
         :rtype: _type_
         """
-        print("--------------------------------------------")
-        print("Checkpoint file found!")
-        path = os.path.join(self.checkpoint_dir, 'checkpoint.pth')
-        print("Loading Checkpoint From: {}".format(path))
-        checkpoint = torch.load(path)
+        checkpoint = torch.load(filepath, map_location=self.device)
         self.model.load_state_dict(checkpoint['model_state_dict'])
-        self.optimizer.load_state_dict(checkpoint['optimizer_state_dict'])
-        epoch_number = checkpoint['epoch']
-        loss = checkpoint['best_loss_on_test']
-        print("Checkpoint File Loaded - epoch_number: {} - loss: {}".format(epoch_number, loss))
-        print('Resuming training from epoch: {}'.format(epoch_number + 1))
-        print("--------------------------------------------")
-        return epoch_number
+        if not eval_only:
+            self.optimizer.load_state_dict(checkpoint['optimizer_state_dict'])
 
     def load_model(self, filepath: Optional[str] = None):
         """
         load_model _summary_
         """
         path = filepath or os.path.join(self.model_dir, 'model.pth')
-        checkpoint = torch.load(path)
+        checkpoint = torch.load(path, map_location=self.device)
         self.parallel()
         self.model.load_state_dict(checkpoint)
 
@@ -185,14 +177,14 @@ class MyModel:
         :rtype: _type_
         """
         self.model = self.model.to(self.device)
-        region = torch.Tensor(region[None, ::]).permute(
+        region = region.permute(
             0, 3, 1, 2).float().to(self.device)
         output = self.model(region).to(self.device)
         output = output.detach().squeeze().cpu().numpy()
-        pred = np.argmax(output)
+        pred = np.argmax(output, axis=1)
         if labels is not None:
             pred = label_decoder(labels, pred)
-        return int(pred)
+        return pred
 
     def diagnose_wsi(self, file_path: str, aggregate: Callable, classes: tuple, labels: dict = None):
         """
