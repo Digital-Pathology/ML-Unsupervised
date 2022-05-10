@@ -20,7 +20,7 @@ class MyModel:
      _summary_
     """
 
-    def __init__(self, model: nn.Module, loss_fn: nn.Module, device: str, checkpoint_dir: str, model_dir: str, optimizer: Optimizer):
+    def __init__(self, model: nn.Module, loss_fn: nn.Module, device, checkpoint_dir: str, model_dir: str, optimizer: Optimizer):
         """
         __init__ _summary_
 
@@ -39,7 +39,8 @@ class MyModel:
         """
         self.model = model
         self.loss_fn = loss_fn
-        self.device = device
+        self.device = torch.device(device) if isinstance(
+            device, str) else device
         phases = ["train"]
         num_classes = 3
         self.all_acc = {key: 0 for key in phases}
@@ -181,6 +182,8 @@ class MyModel:
             0, 3, 1, 2).float().to(self.device)
         output = self.model(region).to(self.device)
         output = output.detach().squeeze().cpu().numpy()
+        if len(output.shape) == 1:
+            output = output.reshape((output.shape[0], 1))
         pred = np.argmax(output, axis=1)
         if labels is not None:
             pred = label_decoder(labels, pred)

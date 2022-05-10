@@ -52,22 +52,28 @@ class ByRegionAnalysisJob(ModelAnalysisJob, abc.ABC):
                                           overwrite_none=False,
                                           overwrite_individuals=False,
                                           loadingbars=False,
-                                          loadingbars_ascii=False):
+                                          loadingbars_ascii=False,
+                                          save_frequency=10,
+                                          tensor_size=config.GET_REGION_PREDICTIONS_GPU_TENSOR_SIZE,
+                                          tensor_device=torch.device('cpu')):
         """ gets predictions of all regions in the dataset and saves them to file after each file """
         # first check to see if there are any predictions
         if self.region_predictions_store.has_predictions() and overwrite_none:
             return
         # then iterate over each file in the dataset
-        for (filename, _, region_generator) in loadingbar(self.dataset.iterate_by_file(as_pytorch_datasets=True),
-                                                          total=len(
-                                                              self.dataset._filepaths),
-                                                          disable=not loadingbars,
-                                                          desc="Getting region predictions",
-                                                          ascii=loadingbars_ascii):
+        for file_num, (filename, _, region_generator) in loadingbar(
+                enumerate(self.dataset.iterate_by_file(
+                    as_pytorch_datasets=True)),
+                total=len(self.dataset._filepaths),
+                disable=not loadingbars,
+                desc="Getting region predictions",
+                ascii=loadingbars_ascii):
             # first check whether files in the store should be overwritten (i.e. if the predictions file isn't complete)
             if self.region_predictions_store.has_predictions(filename) and not overwrite_individuals:
                 continue
             if config.GET_REGION_PREDICTIONS_MODE == config.GetPredictionsMode.CPU_SINGLE_PROCESS:
+                raise NotImplementedError(
+                    "TODO - standardize GetPredictionsMode interface (should be tensor of shape [batch_size, 512, 512, 3])")
                 for region_num, region in loadingbar(enumerate(region_generator),
                                                      disable=not loadingbars,
                                                      total=self.dataset.number_of_regions(
@@ -97,95 +103,96 @@ class ByRegionAnalysisJob(ModelAnalysisJob, abc.ABC):
                     pool.join()
             elif config.GET_REGION_PREDICTIONS_MODE == config.GetPredictionsMode.GPU:
                 # tensors testing only rn
-
-                # the goal is to have the region predictions happening in parallel to multiprocessing-based
-                # fetching of the next batch. This requires:
-                #   -
-
-                regions_n = config.GET_REGION_PREDICTIONS_TENSOR_SIZE
                 dataloader = torch.utils.data.DataLoader(
-                    region_generator, batch_size=regions_n, shuffle=False, drop_last=False, num_workers=multiprocessing.cpu_count())
+                    region_generator, batch_size=tensor_size, shuffle=False, drop_last=False, num_workers=multiprocessing.cpu_count())
                 for batch_num, batch in loadingbar(enumerate(dataloader),
                                                    disable=not loadingbars,
                                                    ascii=loadingbars_ascii,
-                                                   leave=False):
+                                                   leave=False,
+                                                   total=self.dataset.number_of_regions(
+                                                       filename),
+                                                   mininterval=60):
+                    batch = batch.to(tensor_device)
                     predictions = self.region_prediction_callback(batch)
                     for prediction_num, prediction in enumerate(predictions):
                         self.region_predictions_store.store(
-                            filename,
-                            batch_num * regions_n + prediction_num,
-                            prediction
+                            filename=os.path.basename(filename),
+                            region_identifier=batch_num * tensor_size + prediction_num,
+                            prediction=int(prediction)
                         )
 
-                #enumerated_region_generator = enumerate(region_generator)
-                #
-                # def first_n(iterator, n=regions_n, suspected_length=None):
-                #    if suspected_length is not None and suspected_length < n:
-                #        n = suspected_length
-                #    i = 0
-                #    while i < n:
-                #        i += 1
-                #        yield next(iterator)
-                #
-                # def get_n_regions_in_parallel(return_dict, suspected_length):
-                #    try:
-                #        pool = multiprocessing.Pool(
-                #            processes=multiprocessing.cpu_count() - 1)
-                #        data = pool.map(tuple, first_n(
-                #            enumerated_region_generator, suspected_length=suspected_length))
-                #        # [(0,region0), (1,region1), ...] (could be unordered)
-                #        return_dict['data'] = data
-                #    finally:
-                #        pool.close()
-                #        pool.join()
-                #
-                #manager = multiprocessing.Manager()
-                #return_dict = manager.dict()
-                #
-                #remaining_regions = self.dataset.number_of_regions(filename)
-                #get_n_regions_in_parallel(return_dict, remaining_regions)
-                #current_batch = None
-                #
-                # while remaining_regions > 0:
-                #    # first cut the remaining_regions
-                #    current_batch = return_dict['data'].copy()
-                #    remaining_regions -= len(current_batch)
-                #    # start fetching the next batch
-                #    data_fetcher = multiprocessing.Process(
-                #        target=get_n_regions_in_parallel, args=(return_dict, remaining_regions,))
-                #    data_fetcher.start()
-                #    # start the model prediction
-                #    current_tensor = torch.Tensor(
-                #        [region for region_index, region in current_batch])
-                #    region_predictions = self.region_prediction_callback(
-                #        current_tensor)
-                #    # store region predictions
-                #    for region_index, region_prediction in zip((region_index for region_index, region in current_batch), region_predictions):
-                #        self.region_predictions_store.store(
-                #            filename, region_index, region_prediction)
-                #    # wait for next batch to complete
-                #    data_fetcher.join()
+            #enumerated_region_generator = enumerate(region_generator)
+            #
+            # def first_n(iterator, n=regions_n, suspected_length=None):
+            #    if suspected_length is not None and suspected_length < n:
+            #        n = suspected_length
+            #    i = 0
+            #    while i < n:
+            #        i += 1
+            #        yield next(iterator)
+            #
+            # def get_n_regions_in_parallel(return_dict, suspected_length):
+            #    try:
+            #        pool = multiprocessing.Pool(
+            #            processes=multiprocessing.cpu_count() - 1)
+            #        data = pool.map(tuple, first_n(
+            #            enumerated_region_generator, suspected_length=suspected_length))
+            #        # [(0,region0), (1,region1), ...] (could be unordered)
+            #        return_dict['data'] = data
+            #    finally:
+            #        pool.close()
+            #        pool.join()
+            #
+            #manager = multiprocessing.Manager()
+            #return_dict = manager.dict()
+            #
+            #remaining_regions = self.dataset.number_of_regions(filename)
+            #get_n_regions_in_parallel(return_dict, remaining_regions)
+            #current_batch = None
+            #
+            # while remaining_regions > 0:
+            #    # first cut the remaining_regions
+            #    current_batch = return_dict['data'].copy()
+            #    remaining_regions -= len(current_batch)
+            #    # start fetching the next batch
+            #    data_fetcher = multiprocessing.Process(
+            #        target=get_n_regions_in_parallel, args=(return_dict, remaining_regions,))
+            #    data_fetcher.start()
+            #    # start the model prediction
+            #    current_tensor = torch.Tensor(
+            #        [region for region_index, region in current_batch])
+            #    region_predictions = self.region_prediction_callback(
+            #        current_tensor)
+            #    # store region predictions
+            #    for region_index, region_prediction in zip((region_index for region_index, region in current_batch), region_predictions):
+            #        self.region_predictions_store.store(
+            #            filename, region_index, region_prediction)
+            #    # wait for next batch to complete
+            #    data_fetcher.join()
 
-                # for region_set_num, regions in loadingbar(enumerate(iterate_by_n(region_generator,
-                #                                                                 n=regions_n,
-                #                                                                 yield_remainder=True)),
-                #                                          desc=f'iterate_by_n(n={regions_n})',
-                #                                          disable=not loadingbars,
-                #                                          total=math.ceil(
-                #                                              self.dataset.number_of_regions(filename) / regions_n),
-                #                                          leave=False):
-                #    regions_tensor = torch.Tensor(regions)
-                #    predictions = self.region_prediction_callback(
-                #        regions_tensor)
-                #    for region_num, prediction in enumerate(predictions):
-                #        self.region_predictions_store.store(
-                #            filename,
-                #            region_set_num * regions_n + region_num,
-                #            prediction
-                #        )
+            # for region_set_num, regions in loadingbar(enumerate(iterate_by_n(region_generator,
+            #                                                                 n=regions_n,
+            #                                                                 yield_remainder=True)),
+            #                                          desc=f'iterate_by_n(n={regions_n})',
+            #                                          disable=not loadingbars,
+            #                                          total=math.ceil(
+            #                                              self.dataset.number_of_regions(filename) / regions_n),
+            #                                          leave=False):
+            #    regions_tensor = torch.Tensor(regions)
+            #    predictions = self.region_prediction_callback(
+            #        regions_tensor)
+            #    for region_num, prediction in enumerate(predictions):
+            #        self.region_predictions_store.store(
+            #            filename,
+            #            region_set_num * regions_n + region_num,
+            #            prediction
+            #        )
             else:
                 raise ValueError(
                     f"Invalid configuration: {config.GET_REGION_PREDICTIONS_MODE = }")
+
+            if (file_num + 1) % save_frequency == 0:
+                self.region_predictions_store.save_region_predictions()
 
         self.region_predictions_store.save_region_predictions()
 
@@ -198,7 +205,8 @@ class WeightRatioAnalysisJob(ByRegionAnalysisJob):
                  region_prediction_callback: Callable,
                  region_predictions_filename='region_predictions.json') -> None:
         """ class docstring """
-        region_predictions_store = region_predictions_stores['aggregated']()
+        region_predictions_store = region_predictions_stores['aggregated'](
+            filename=region_predictions_filename)
         super().__init__(dataset, region_prediction_callback,
                          region_predictions_store, region_predictions_filename)
 

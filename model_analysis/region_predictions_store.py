@@ -83,6 +83,7 @@ class AggregatedRegionPredictionsStore(IndexedRegionPredictionsStore):
 
     def store(self, filename: str, region_identifier: int, prediction: int):
         """ class docstring """
+        prediction = str(prediction)
         if filename not in self.data:
             self.data[filename] = {}
         if prediction not in self.data[filename]:

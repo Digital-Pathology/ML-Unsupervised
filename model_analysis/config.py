@@ -1,6 +1,6 @@
 
-# 0=cpu-single-process; 1=cpu multiprocessing; 2=gpu
 from enum import Enum
+import os
 
 
 class GetPredictionsMode(Enum):
@@ -10,7 +10,7 @@ class GetPredictionsMode(Enum):
 
 
 GET_REGION_PREDICTIONS_MODE = GetPredictionsMode.GPU
-GET_REGION_PREDICTIONS_TENSOR_SIZE = 4
+GET_REGION_PREDICTIONS_GPU_TENSOR_SIZE = 4
 
 ALL_METRICS = (
     'AC1',
