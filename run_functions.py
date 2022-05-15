@@ -5,7 +5,6 @@ import multiprocessing
 
 import torch
 
-from aws_utils.s3_sagemaker_utils import S3SageMakerUtils
 from dataset import Dataset, LabelManager, label_extractor
 from filtration import FilterManager, FilterBlackAndWhite, FilterHSV, FilterFocusMeasure
 from histolab.scorer import NucleiScorer
@@ -15,6 +14,7 @@ from tqdm import tqdm as loadingbar
 
 from model_analysis.by_region_analysis_job import WeightRatioAnalysisJob
 import sagemaker_stuff
+from tiling.tile_dataset import TilesDataset
 from util import open_file
 
 
@@ -37,35 +37,35 @@ def pull_dataset_filtraton_cache():
     )
 
 
-def pull_tiles_dataset_scoring_data():
+def pull_tiles_dataset_scoring_data(data_path):
     sagemaker_stuff.util.download_file_from_s3(
         s3_bucket="digpath-tilescore",
-        s3_path="scoring_data.json",
+        s3_path=data_path,
         destination='.',
         print_status=True
     )
 
 
-def initialize_dataset(data_path=None, dont_save_labels=False):
+def initialize_dataset():
+    # filtration cache
     if sagemaker_stuff.config.FILTRATION_CACHE_DOWNLOAD:
         pull_dataset_filtraton_cache()
 
-    if data_path is None:
-        data_path = os.path.join(
-            sagemaker_stuff.config.DIR_DATA_TRAIN,
-            sagemaker_stuff.config.DIR_DATA_TRAIN_SUBDIR
-        )
-    labels = None
-    if isinstance(data_path, list):
-        labels = LabelManager(
-            path=None,
-            label_extraction=label_extractor.LabelExtractorNoLabels()
-        )
-    else:
-        labels = LabelManager(
-            path=data_path,
-            label_postprocessor=os.path.basename
-        )
+    # dataset details
+    data_path = os.path.join(
+        sagemaker_stuff.config.DIR_DATA_TRAIN,
+        sagemaker_stuff.config.DIR_DATA_TRAIN_SUBDIR
+    )
+    label_map = {
+        "mild": 0,
+        "moderate": 1,
+        "severe": 2
+    }
+    labels = LabelManager(
+        path=data_path,
+        label_postprocessor=lambda relpath: label_map[os.path.basename(
+            relpath).lower()]
+    )
     filtration = FilterManager([
         FilterBlackAndWhite(),
         FilterHSV(),
@@ -76,12 +76,22 @@ def initialize_dataset(data_path=None, dont_save_labels=False):
         labels=labels,
         filtration=filtration
     )
-    # also save the filtration cache to output dir
+
+    # tiles dataset
+    if sagemaker_stuff.config.DATASET_AS_TILES_DATASET:
+        if sagemaker_stuff.config.TILE_SCORING_DATA_DOWNLOAD:
+            pull_tiles_dataset_scoring_data(
+                sagemaker_stuff.config.TILE_SCORING_DATA_PATH)
+        scoring_data_path = "scoring_data.json"
+        dataset = TilesDataset(dataset, scoring_data_path)
+        sagemaker_stuff.util.copy_file_to_tar_dir(scoring_data_path)
+
+    # save the filtration cache to output dir
     if sagemaker_stuff.config.FILTRATION_CACHE_UPLOAD:
         sagemaker_stuff.util.copy_file_to_tar_dir(
             dataset.filtration_cache.h5filepath)
-    # also save dataset labels
-    if not dont_save_labels and sagemaker_stuff.config.DATASET_SAVE_LABELS:
+    # save dataset labels
+    if sagemaker_stuff.config.DATASET_SAVE_LABELS:
         save_labels_from_dataset(dataset)
     return dataset
 

@@ -84,12 +84,20 @@ DATASET_SAVE_LABELS_FILENAME = process_environment_variable(
     "DATASET_SAVE_LABELS_FILENAME", default="dataset_labels.json")
 DATASET_SAVE_LABELS_IMAGE_BASENAME = process_environment_variable(
     "DATASET_SAVE_LABELS_IMAGE_BASENAME", desired_type=bool, default=False)
+DATASET_AS_TILES_DATASET = process_environment_variable(
+    "DATASET_AS_TILES_DATASET", desired_type=bool, default=False)
 
 # Filtration Cacheing
 FILTRATION_CACHE_DOWNLOAD = process_environment_variable(
     "FILTRATION_CACHE_DOWNLOAD", desired_type=bool, default=False)
 FILTRATION_CACHE_UPLOAD = process_environment_variable(
     "FILTRATION_CACHE_UPLOAD", desired_type=bool, default=False)
+
+# Tile Scoring Data
+TILE_SCORING_DATA_DOWNLOAD = process_environment_variable(
+    "TILE_SCORING_DATA_DOWNLOAD", desired_type=bool, default=False)
+TILE_SCORING_DATA_PATH = process_environment_variable(
+    "TILE_SCORING_DATA_PATH", default="digpath-data/scoring_data.json")
 
 # Region Predictions Intermediate Saving
 GET_REGION_PREDICTIONS_SAVE_FREQUENCY = process_environment_variable(
