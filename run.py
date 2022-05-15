@@ -25,15 +25,11 @@ def main():
 
     run_functions.announce_testing_status()
 
-    run_functions.announce("Loading Model")
-    model_callback = run_functions.get_model_callback()
-
     run_functions.announce("Initializing Dataset")
     dataset = run_functions.initialize_dataset()
 
-    run_functions.announce("Get Analysis Job Region Predictions")
-    analysis_job = run_functions.do_analysis_job_preprocessing(
-        dataset, model_callback)
+    run_functions.announce("Scoring Tiles")
+    run_functions.do_tile_scoring(dataset)
 
 
 if __name__ == "__main__":
