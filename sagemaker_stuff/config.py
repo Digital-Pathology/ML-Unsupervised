@@ -47,7 +47,7 @@ DATA_AND_MODEL_DEVICE = process_environment_variable(
     "DATA_AND_MODEL_DEVICE", default=('cuda' if torch.cuda.is_available() else 'cpu'))
 
 # Model Parameters
-MODEL_NAME = process_environment_variable("MODEL_NAME")
+MODEL_NAME = process_environment_variable("MODEL_NAME", default="kevin_tiles")
 MODEL_IS_CHECKPOINT = process_environment_variable(
     "MODEL_IS_CHECKPOINT", desired_type=bool, default=True)
 
