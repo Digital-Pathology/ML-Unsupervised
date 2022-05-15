@@ -36,7 +36,7 @@ def main():
 
     announce("Starting the Training!")
     do_train(
-        model="deit_tiny_patch16_224",
+        model="deit_tiny_patch16_512",
         batch_size=sagemaker_stuff.config.BATCH_SIZE,
         data_path=sagemaker_stuff.config.DIR_DATA_TRAIN,
         output_dir=sagemaker_stuff.config.DIR_OUTPUT,
