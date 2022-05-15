@@ -15,35 +15,25 @@ import PIL
 import torch
 from tqdm import tqdm as loadingbar
 
-from run_functions import announce, announce_testing_status, pull_dataset_filtraton_cache, pull_tiles_dataset_scoring_data
+import run_functions
 import sagemaker_stuff
 import util
-
-from testing.deit.main import do_train
 
 
 def main():
     """ main """
 
-    announce_testing_status()
+    run_functions.announce_testing_status()
 
-    if not sagemaker_stuff.config.IS_TESTING_LOCALLY:
-        announce("Pulling Filtration Cache")
-        pull_dataset_filtraton_cache()
+    run_functions.announce("Loading Model")
+    model_callback = run_functions.get_model_callback()
 
-        announce("Pulling Tile Scoring Data")
-        pull_tiles_dataset_scoring_data()
+    run_functions.announce("Initializing Dataset")
+    dataset = run_functions.initialize_dataset()
 
-    announce("Starting the Training!")
-    do_train(
-        model="deit_tiny_patch16_224",
-        batch_size=sagemaker_stuff.config.BATCH_SIZE,
-        data_path=sagemaker_stuff.config.DIR_DATA_TRAIN,
-        output_dir=sagemaker_stuff.config.DIR_OUTPUT,
-        device=sagemaker_stuff.config.DATA_AND_MODEL_DEVICE,
-        dataset_filtration_cache_path="filtration_cache.h5",
-        scoring_data_path="scoring_data.json"
-    )
+    run_functions.announce("Get Analysis Job Region Predictions")
+    analysis_job = run_functions.do_analysis_job_preprocessing(
+        dataset, model_callback)
 
 
 if __name__ == "__main__":

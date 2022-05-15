@@ -112,9 +112,13 @@ def get_model_callback():
         optimizer=None,
         model_dir=None
     )
-    checkpoint_path = os.path.join(os.path.dirname(
-        __file__), "lazy_model/model_5_epochs.pth")  # Kevin's discord message from 5/7 11:17pm
-    model_mymodel.load_checkpoint(checkpoint_path, eval_only=True)
+    if sagemaker_stuff.config.MODEL_IS_CHECKPOINT:
+        checkpoint_path = os.path.join(os.path.dirname(
+            __file__), f"lazy_model/{sagemaker_stuff.config.MODEL_NAME}.pth")
+        model_mymodel.load_checkpoint(checkpoint_path, eval_only=True)
+    else:
+        raise NotImplementedError(
+            "non-checkpoint model loading isn't implemented yet")
     return model_mymodel.diagnose_region
 
 

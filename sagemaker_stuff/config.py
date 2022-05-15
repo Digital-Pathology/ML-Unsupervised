@@ -48,6 +48,8 @@ DATA_AND_MODEL_DEVICE = process_environment_variable(
 
 # Model Parameters
 MODEL_NAME = process_environment_variable("MODEL_NAME")
+MODEL_IS_CHECKPOINT = process_environment_variable(
+    "MODEL_IS_CHECKPOINT", desired_type=bool, default=True)
 
 # Data Handling
 BATCH_SIZE = process_environment_variable(

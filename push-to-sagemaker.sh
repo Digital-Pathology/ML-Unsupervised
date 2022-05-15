@@ -14,8 +14,7 @@ rm -rf \
     .git* \
     archive \
     datasets \
-    testing/TransPath \
-    testing/histolab \
+    testing \
     *.ipynb \
     filtration_cache.h5 \
     README.md \
