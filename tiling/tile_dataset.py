@@ -61,3 +61,33 @@ class TilesDataset(torch.utils.data.Dataset):
                 label_distribution[label] = 0
             label_distribution[label] += 1
         return label_distribution
+
+    def iterate_by_file(self, as_pytorch_datasets=False):
+        if not as_pytorch_datasets:
+            def regions_generator(filename: str):
+                for i in range(self.number_of_regions(filename)):
+                    yield self.underlying_dataset.get_region(filename, i)
+            for filename in self._filepaths:
+                yield filename, self.get_label(filename), regions_generator(filename)
+        else:
+            class SingleFileDataset(torch.utils.data.Dataset):
+                def __init__(self, base_dataset, filename) -> None:
+                    self.base_dataset = base_dataset
+                    self.filename = filename
+
+                def __getitem__(self, index):
+                    return self.base_dataset.get_region(self.filename, index)
+
+                def __len__(self):
+                    return self.base_dataset.number_of_regions(self.filename)
+            for filename in self._filepaths:
+                yield filename, self.get_label(filename), SingleFileDataset(base_dataset=self.underlying_dataset, filename=filename)
+
+    def get_label(self, filename):
+        return self.underlying_dataset.get_label(filename)
+
+    def number_of_regions(self, filename=None):
+        if filename is None:
+            return len(self)
+        else:
+            return self._passing_region_counts[filename]

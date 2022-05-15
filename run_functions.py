@@ -77,6 +77,14 @@ def initialize_dataset():
         filtration=filtration
     )
 
+    # save the filtration cache to output dir
+    if sagemaker_stuff.config.FILTRATION_CACHE_UPLOAD:
+        sagemaker_stuff.util.copy_file_to_tar_dir(
+            dataset.filtration_cache.h5filepath)
+    # save dataset labels
+    if sagemaker_stuff.config.DATASET_SAVE_LABELS:
+        save_labels_from_dataset(dataset)
+
     # tiles dataset
     if sagemaker_stuff.config.DATASET_AS_TILES_DATASET:
         if sagemaker_stuff.config.TILE_SCORING_DATA_DOWNLOAD:
@@ -86,13 +94,6 @@ def initialize_dataset():
         dataset = TilesDataset(dataset, scoring_data_path)
         sagemaker_stuff.util.copy_file_to_tar_dir(scoring_data_path)
 
-    # save the filtration cache to output dir
-    if sagemaker_stuff.config.FILTRATION_CACHE_UPLOAD:
-        sagemaker_stuff.util.copy_file_to_tar_dir(
-            dataset.filtration_cache.h5filepath)
-    # save dataset labels
-    if sagemaker_stuff.config.DATASET_SAVE_LABELS:
-        save_labels_from_dataset(dataset)
     return dataset
 
 
