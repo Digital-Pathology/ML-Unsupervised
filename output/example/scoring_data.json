@@ -1,0 +1,14 @@
+{
+    "/workspaces/dev-container/testing/data/whole_slide_images/train/0/84440T_004.tif": [
+        [
+            0.04365461170295601,
+            182
+        ]
+    ],
+    "/workspaces/dev-container/testing/data/whole_slide_images/train/1/84429T_003.tif": [
+        [
+            0.06391989230772681,
+            1829
+        ]
+    ]
+}
