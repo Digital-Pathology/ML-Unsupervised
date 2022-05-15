@@ -1,6 +1,6 @@
 #!/bin/bash
 
-IMAGE_NAME=adin_transformer
+IMAGE_NAME=adin_model_eval
 
 date
 
