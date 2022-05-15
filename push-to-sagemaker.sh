@@ -2,6 +2,8 @@
 
 IMAGE_NAME=adin_model_eval
 
+echo "pushing to" $IMAGE_NAME
+
 date
 
 # copy material over from this directory
