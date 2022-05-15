@@ -1,5 +1,7 @@
 #!/bin/bash
 
+IMAGE_NAME=adin_transformer
+
 date
 
 # copy material over from this directory
@@ -12,7 +14,8 @@ rm -rf \
     .git* \
     archive \
     datasets \
-    testing \
+    testing/TransPath \
+    testing/histolab \
     *.ipynb \
     filtration_cache.h5 \
     README.md \
@@ -23,6 +26,8 @@ rm -rf \
     environment.yml
 
 # do the thing
-time build_and_push adin_model_eval_test
+time build_and_push $IMAGE_NAME
 
 date
+
+echo "pushed to" $IMAGE_NAME

@@ -51,20 +51,22 @@ MODEL_NAME = process_environment_variable("MODEL_NAME")
 
 # Data Handling
 BATCH_SIZE = process_environment_variable(
-    "BATCH_SIZE", desired_type=int, default=4)
+    "BATCH_SIZE", desired_type=int, default=2)
 
 # Display Options
 ANNOUNCEMENT_PREFIX = process_environment_variable(
     "ANNOUNCEMENT_PREFIX", default="-->")
 LOADING_BARS = process_environment_variable(
     "LOADING_BARS", desired_type=bool, default=IS_TESTING_LOCALLY)
-LOADING_BARS_MININTERVAL = process_environment_variable(
-    "LOADING_BARS_MININTERVAL", desired_type=int, default=60)
+UPDATE_INTERVAL = process_environment_variable(
+    "UPDATE_INTERVAL", desired_type=int, default=4)
 
 # Directory Locations
 DIR_DATA_TRAIN = process_environment_variable(
     "SM_CHANNEL_TRAIN",
     default="/workspaces/dev-container/testing/data/whole_slide_images/train")
+DIR_DATA_TRAIN_SUBDIR = process_environment_variable(
+    "DIR_DATA_TRAIN_SUBDIR", default="")
 DIR_DATA_TEST = process_environment_variable(
     "SM_CHANNEL_TEST")
 DIR_OUTPUT = process_environment_variable(
