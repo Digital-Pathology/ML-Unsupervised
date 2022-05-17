@@ -409,7 +409,8 @@ class Slide:
         for contour in contours:
             contour = np.ceil(contour)
             contour = np.vstack([contour[:, 1], contour[:, 0]]).T
-            PIL.ImageDraw.Draw(img).polygon(contour.ravel().tolist(), outline=outline)
+            PIL.ImageDraw.Draw(img).polygon(
+                contour.ravel().tolist(), outline=outline)
 
         return img
 
@@ -485,7 +486,8 @@ class Slide:
             thumbnail = self.thumbnail
             thumbnail.show()  # pragma: no cover
         except FileNotFoundError as error:
-            raise FileNotFoundError(f"Cannot display the slide thumbnail: {error}")
+            raise FileNotFoundError(
+                f"Cannot display the slide thumbnail: {error}")
 
     @lazyproperty
     def thumbnail(self) -> PIL.Image.Image:
@@ -738,7 +740,8 @@ class Slide:
                 f"The wsi path resource doesn't exist: {self._path}"
             )
         except Exception as other_error:
-            raise HistolabException(other_error.__repr__() + f". {bad_format_error}")
+            raise HistolabException(
+                other_error.__repr__() + f". {bad_format_error}")
         return slide
 
 
@@ -772,7 +775,8 @@ class SlideSet:
             if (os.path.splitext(name)[1] in self._valid_extensions)
         ]
         if self._keep_slides is not None:
-            slide_names = [name for name in slide_names if name in self._keep_slides]
+            slide_names = [
+                name for name in slide_names if name in self._keep_slides]
         return iter(
             [
                 Slide(

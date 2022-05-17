@@ -225,8 +225,8 @@ class Tile:
 
         # remove border
         mask = mask_border[
-            border_thickness : np_tile.shape[0] + border_thickness,
-            border_thickness : np_tile.shape[1] + border_thickness,
+            border_thickness: np_tile.shape[0] + border_thickness,
+            border_thickness: np_tile.shape[1] + border_thickness,
         ]
         return mask
 
@@ -239,7 +239,8 @@ class Tile:
         float
             Ratio of the tissue area over the total area of the tile
         """
-        tissue_ratio = np.count_nonzero(self.tissue_mask) / self.tissue_mask.size
+        tissue_ratio = np.count_nonzero(
+            self.tissue_mask) / self.tissue_mask.size
         return tissue_ratio
 
     # ------- implementation helpers -------

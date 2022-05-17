@@ -96,7 +96,8 @@ class Lambda(ImageFilter):
     """  # noqa
 
     def __init__(self, lambd: Callable[[PIL.Image.Image], PIL.Image.Image]) -> None:
-        assert callable(lambd), repr(type(lambd).__name__) + " object is not callable"
+        assert callable(lambd), repr(type(lambd).__name__) + \
+            " object is not callable"
         self.lambd = lambd
 
     def __call__(self, img: PIL.Image.Image) -> Union[PIL.Image.Image, np.ndarray]:
@@ -624,7 +625,8 @@ class AdaptiveEqualization(ImageFilter):
         self.clip_limit = clip_limit
 
     def __call__(self, img: PIL.Image.Image) -> PIL.Image.Image:
-        adaptive_equ = F.adaptive_equalization(img, self.n_bins, self.clip_limit)
+        adaptive_equ = F.adaptive_equalization(
+            img, self.n_bins, self.clip_limit)
         return adaptive_equ
 
 

@@ -53,7 +53,8 @@ class FiltersComposition:
             "Compose": _CustomFiltersComposition,
         }.get(cls_.__name__)
         if FiltersSubCls:
-            instance = super(FiltersComposition, FiltersSubCls).__new__(FiltersSubCls)
+            instance = super(FiltersComposition,
+                             FiltersSubCls).__new__(FiltersSubCls)
             return instance
         raise FilterCompositionError(
             f"Filters composition for the class {cls_.__name__} is not available"

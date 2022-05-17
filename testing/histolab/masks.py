@@ -136,7 +136,8 @@ class BiggestTissueBoxMask(BinaryMask):
             If ``n`` is not between 1 and the number of elements of ``regions``
         """
         if n < 1:
-            raise ValueError(f"Number of regions must be greater than 0, got {n}.")
+            raise ValueError(
+                f"Number of regions must be greater than 0, got {n}.")
         if n > len(regions):
             raise ValueError(
                 f"n should be smaller than the number of regions [{len(regions)}], "

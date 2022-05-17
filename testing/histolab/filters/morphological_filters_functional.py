@@ -52,7 +52,8 @@ def remove_small_objects(
     np.ndarray
         Mask with small objects filtered out
     """
-    mask_no_small_object = sk_morphology.remove_small_objects(np_mask, min_size)
+    mask_no_small_object = sk_morphology.remove_small_objects(
+        np_mask, min_size)
     if (
         avoid_overmask
         and mask_percent(mask_no_small_object) >= overmask_thresh
