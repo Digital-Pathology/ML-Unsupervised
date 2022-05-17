@@ -98,7 +98,8 @@ def blue_pen_filter(img: PIL.Image.Image) -> PIL.Image.Image:
     ]
 
     blue_pen_filter_img = reduce(
-        (lambda x, y: x & y), [blue_filter(img, **param) for param in parameters]
+        (lambda x, y: x & y), [blue_filter(img, **param)
+                               for param in parameters]
     )
     return apply_mask_image(img, blue_pen_filter_img)
 
@@ -184,7 +185,8 @@ def green_pen_filter(img: PIL.Image.Image) -> PIL.Image.Image:
     ]
 
     green_pen_filter_img = reduce(
-        (lambda x, y: x & y), [green_filter(img, **param) for param in parameters]
+        (lambda x, y: x & y), [green_filter(img, **param)
+                               for param in parameters]
     )
     return apply_mask_image(img, green_pen_filter_img)
 
@@ -318,7 +320,8 @@ def kmeans_segmentation(
     if img.mode == "RGBA":
         raise ValueError("Input image cannot be RGBA")
     img_arr = np.array(img)
-    labels = sk_segmentation.slic(img_arr, n_segments, compactness, start_label=0)
+    labels = sk_segmentation.slic(
+        img_arr, n_segments, compactness, start_label=0)
     return np_to_pil(sk_color.label2rgb(labels, img_arr, kind="avg", bg_label=-1))
 
 
@@ -343,7 +346,8 @@ def lab_to_rgb(
         Image in RGB space.
     """
     img_arr = np.array(img)
-    rgb_arr = sk_color.lab2rgb(img_arr, illuminant=illuminant, observer=observer)
+    rgb_arr = sk_color.lab2rgb(
+        img_arr, illuminant=illuminant, observer=observer)
     rgb = np_to_pil(rgb_arr)
     return rgb
 
@@ -500,7 +504,8 @@ def red_pen_filter(img: PIL.Image.Image) -> PIL.Image.Image:
         {"red_thresh": 85, "green_thresh": 25, "blue_thresh": 45},
     ]
     red_pen_filter_img = reduce(
-        (lambda x, y: x & y), [red_filter(img, **param) for param in parameters]
+        (lambda x, y: x & y), [red_filter(img, **param)
+                               for param in parameters]
     )
     return apply_mask_image(img, red_pen_filter_img)
 
@@ -591,7 +596,8 @@ def rgb_to_lab(
     if img.mode != "RGB":
         raise Exception("Input image must be RGB")
     img_arr = np.array(img)
-    lab_arr = sk_color.rgb2lab(img_arr, illuminant=illuminant, observer=observer)
+    lab_arr = sk_color.rgb2lab(
+        img_arr, illuminant=illuminant, observer=observer)
     return lab_arr
 
 
@@ -757,7 +763,8 @@ def filter_entropy(
     if np.array(img).ndim != 2:
         raise ValueError("Input must be 2D.")
     img_arr = np.array(img)
-    entropy = sk_filters.rank.entropy(img_arr, np.ones((neighborhood, neighborhood)))
+    entropy = sk_filters.rank.entropy(
+        img_arr, np.ones((neighborhood, neighborhood)))
     return threshold_to_mask(entropy, threshold, relate)
 
 
@@ -919,7 +926,8 @@ def hysteresis_threshold_mask(
         raise ValueError("thresholds cannot be None")
     grey_scale = PIL.ImageOps.grayscale(img)
     comp = invert(grey_scale)
-    hyst_mask = sk_filters.apply_hysteresis_threshold(np.array(comp), low, high)
+    hyst_mask = sk_filters.apply_hysteresis_threshold(
+        np.array(comp), low, high)
     return hyst_mask
 
 
